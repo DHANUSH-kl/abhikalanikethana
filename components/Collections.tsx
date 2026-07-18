@@ -3,8 +3,8 @@
 import React, { useRef } from "react";
 import Image from "next/image";
 import SplitText from "./SplitText";
-import { gsap } from "gsap-trial";
-import { ScrollTrigger } from "gsap-trial/ScrollTrigger";
+import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
 import { Palette, Layers, Compass, BookOpen } from "lucide-react";
 

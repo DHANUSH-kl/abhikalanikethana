@@ -3,7 +3,7 @@
 import React, { useRef } from 'react';
 import Image from 'next/image';
 import { ArrowRight, ArrowUpRight, Leaf } from 'lucide-react';
-import { gsap } from "gsap-trial";
+import { gsap } from "gsap";
 import { useGSAP } from "@gsap/react";
 import { BrushTopRight, BrushBottomLeft } from './BrushStrokes';
 

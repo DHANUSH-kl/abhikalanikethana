@@ -3,8 +3,8 @@
 import React, { useState, useRef, useEffect } from "react";
 import Image from "next/image";
 import { Search, MessageCircle } from "lucide-react";
-import { gsap } from "gsap-trial";
-import { ScrollTrigger } from "gsap-trial/ScrollTrigger";
+import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
 
 gsap.registerPlugin(ScrollTrigger, useGSAP);
