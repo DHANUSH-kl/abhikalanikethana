@@ -58,9 +58,9 @@ export default function Navbar() {
           <Image
             src="/Abhikalaanikethana Logo Transperent.png"
             alt="Abhikalaanikethana Logo"
-            width={240}
-            height={48}
-            className="h-12 w-auto object-contain transition-transform duration-300 ease-out group-hover:scale-[1.02]"
+            width={280}
+            height={56}
+            className="h-14 w-auto object-contain transition-transform duration-300 ease-out group-hover:scale-[1.02]"
             priority
           />
         </a>

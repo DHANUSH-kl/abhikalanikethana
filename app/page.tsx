@@ -5,8 +5,12 @@ import Navbar from "@/components/Navbar";
 import HeroSection from "@/components/HeroSection";
 import Collections from "@/components/Collections";
 import AboutSection from "@/components/AboutSection";
+import FoundersSection from "@/components/FoundersSection";
+import StatsSection from "@/components/StatsSection";
 import ArtworksCatalog from "@/components/ArtworksCatalog";
+import RecentlyAcquired from "@/components/RecentlyAcquired";
 import Features from "@/components/Features";
+import FAQSection from "@/components/FAQSection";
 import Footer from "@/components/Footer";
 
 export default function Home() {
@@ -17,8 +21,12 @@ export default function Home() {
         <HeroSection />
         <Collections />
         <AboutSection />
+        <FoundersSection />
+        <StatsSection />
         <ArtworksCatalog />
+        <RecentlyAcquired />
         <Features />
+        <FAQSection />
       </main>
       <Footer />
     </>

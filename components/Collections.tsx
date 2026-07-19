@@ -19,53 +19,41 @@ interface CollectionCardProps {
   icon: React.ComponentType<{ size: number; className?: string }>;
 }
 
-function CollectionCard({ imageSrc, title, desc, index, accentColor, icon: IconComponent }: CollectionCardProps) {
-  const paddedIndex = String(index + 1).padStart(2, "0");
-
+function CollectionCard({ imageSrc, title, desc, index, accentColor }: CollectionCardProps) {
   return (
-    <div className="accordion-card group relative overflow-hidden rounded-[28px] sm:rounded-[32px] bg-[#141211] border border-white/5 cursor-pointer aspect-[3/4.2] transition-all duration-[600ms] ease-[cubic-bezier(0.16,1,0.3,1)] opacity-100 scale-100 group-hover/container:opacity-50 group-hover/container:scale-[0.96] hover:!opacity-100 hover:!scale-[1.03] hover:-translate-y-3 hover:shadow-[0_35px_70px_-15px_rgba(0,0,0,0.75)] hover:border-white/10">
-      {/* Background Image with Cinematic Zoom */}
-      <div className="absolute inset-0 w-full h-full z-0 overflow-hidden">
-        <Image
-          src={imageSrc}
-          alt={title}
-          fill
-          sizes="(max-width: 1023px) 100vw, 25vw"
-          className="card-image object-cover transition-transform duration-[1000ms] ease-[cubic-bezier(0.16,1,0.3,1)] scale-[1.03] group-hover:scale-[1.06]"
-        />
-        {/* Dynamic Vignette Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-[#0e0c0b] via-[#0e0c0b]/25 to-transparent opacity-90 z-10" />
+    <div 
+      style={{ backgroundColor: accentColor }}
+      className="collection-card group relative overflow-hidden rounded-[24px] cursor-pointer flex flex-col p-5 sm:p-6 transition-all duration-[600ms] ease-[cubic-bezier(0.16,1,0.3,1)] hover:-translate-y-2.5 hover:shadow-[0_20px_40px_rgba(0,0,0,0.18)]"
+    >
+      {/* Framed Image Container */}
+      <div className="relative w-full aspect-[4/5] rounded-[16px] overflow-hidden mb-6 flex items-center justify-center bg-white/5 border border-white/10 shadow-[inset_0_4px_12px_rgba(255,255,255,0.05)]">
+        <div className="relative w-full h-full">
+          <Image
+            src={imageSrc}
+            alt={title}
+            fill
+            sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 25vw"
+            className="object-cover transition-transform duration-700 ease-out scale-[1.01] group-hover:scale-[1.05]"
+            priority={index < 2}
+          />
+        </div>
       </div>
 
-      {/* Floating Card Badge (Always full width and constant border-radius to prevent border morph stutter) */}
-      <div className="absolute bottom-5 left-5 right-5 z-20 bg-[#faf8f5]/95 backdrop-blur-md border border-white/60 p-4 sm:p-5 rounded-[24px] sm:rounded-[28px] shadow-lg flex flex-col justify-start transition-colors duration-500 ease-out group-hover:bg-[#faf8f5]/98">
+      {/* Content */}
+      <div className="flex flex-col flex-grow text-white">
+        <h3 className="font-serif text-[1.25rem] sm:text-[1.35rem] font-medium tracking-[0.05em] uppercase mb-2.5 leading-tight">
+          {title}
+        </h3>
         
-        {/* Top Header Row (Always visible and stable) */}
-        <div className="flex items-center justify-between w-full">
-          <div className="flex items-center gap-3 min-w-0">
-            {/* Circle Icon Wrapper */}
-            <div className="w-8 h-8 rounded-full border border-[#0e0c0b]/10 flex items-center justify-center bg-white flex-shrink-0">
-              <IconComponent size={14} className="text-[#0e0c0b]/80" />
-            </div>
-            {/* Title */}
-            <h3 className="font-sans font-bold text-xs sm:text-[13px] text-[#0e0c0b] tracking-wider uppercase">
-              {title}
-            </h3>
-          </div>
-          
-          {/* Verified Check */}
-          <svg className="w-4.5 h-4.5 flex-shrink-0" style={{ color: accentColor }} fill="currentColor" viewBox="0 0 20 20">
-            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l5-5z" clipRule="evenodd" />
-          </svg>
-        </div>
+        <p className="text-white/85 text-[12px] sm:text-[13px] font-sans font-light leading-relaxed mb-6 flex-grow pr-1">
+          {desc}
+        </p>
 
-        {/* Bottom Drawer (Expands vertically using hardware-accelerated max-height transitions) */}
-        <div className="max-h-0 opacity-0 overflow-hidden transition-all duration-[600ms] ease-[cubic-bezier(0.16,1,0.3,1)] mt-0 group-hover:max-h-[120px] group-hover:opacity-100 group-hover:mt-3">
-          <p className="text-[#0e0c0b]/70 text-[11px] sm:text-xs font-light leading-relaxed pr-1">
-            {desc}
-          </p>
+        {/* View Details Link */}
+        <div className="flex items-center gap-1.5 text-white/90 font-sans text-[11px] font-semibold tracking-[0.15em] uppercase mt-auto group-hover:text-white">
+          <span>VIEW DETAILS</span>
+          <span className="transition-transform duration-300 group-hover:translate-x-1.5">→</span>
         </div>
-
       </div>
     </div>
   );
@@ -78,7 +66,7 @@ export default function Collections() {
     () => {
       // Premium entry stagger: when section enters viewport, cards animate one-by-one with a smooth delay
       gsap.fromTo(
-        ".accordion-card",
+        ".collection-card",
         {
           y: 80,
           opacity: 0,
@@ -90,7 +78,7 @@ export default function Collections() {
           duration: 1.4,
           ease: "power4.out",
           scrollTrigger: {
-            trigger: ".accordion-container",
+            trigger: ".collections-grid-container",
             start: "top 85%",
             once: true,
           },
@@ -104,29 +92,29 @@ export default function Collections() {
     {
       imageSrc: "/painting_expressions.png",
       title: "HUMAN EXPRESSIONS",
-      desc: "An intimate exploration of raw, unfiltered human moods, silent stories, and complex emotions preserved on canvas.",
-      accentColor: "#D66853", // Raw Terracotta
+      desc: "Exploring the many moods, emotions and stories within.",
+      accentColor: "#D36135", // Burnt Terracotta
       icon: Palette
     },
     {
       imageSrc: "/painting_balance.png",
       title: "FORM & BALANCE",
-      desc: "A structural playground balancing architectural gravity, geometric precision, and fluid natural curves.",
-      accentColor: "#5D7A68", // Deep Sage
+      desc: "A play of shapes, structure and visual harmony.",
+      accentColor: "#A4C345", // Olive Lime Green
       icon: Layers
     },
     {
       imageSrc: "/painting_journeys.png",
       title: "INNER JOURNEYS",
-      desc: "A surreal mapping of internal dreamscapes and abstract memories, guided purely by subconscious textures.",
-      accentColor: "#7B6F8E", // Muted Amethyst
+      desc: "Abstract narratives inspired by dreams and thoughts.",
+      accentColor: "#A892CC", // Lavender Purple
       icon: Compass
     },
     {
       imageSrc: "/painting_stories.png",
       title: "SILENT STORIES",
-      desc: "Fleeting atmospheric moments frozen in stillness. An exercise in heavy silence, minimalism, and spacious composition.",
-      accentColor: "#E2B13C", // Ochre Yellow
+      desc: "Moments frozen in time, expressed in simplicity.",
+      accentColor: "#EBB637", // Warm Yellow Ochre
       icon: BookOpen
     },
   ];
@@ -135,7 +123,7 @@ export default function Collections() {
     <section 
       ref={sectionRef} 
       id="collections" 
-      className="collections-section flex flex-col justify-between py-20 px-6 sm:px-8 lg:px-16 relative overflow-hidden bg-[#0e0c0b] min-h-screen h-auto lg:h-screen lg:max-h-screen lg:pt-[8vh] lg:pb-[14vh] transition-colors duration-1000 ease-[cubic-bezier(0.16,1,0.3,1)] z-[2] lg:has-[.accordion-card:nth-child(1):hover]:bg-[#160f0d] lg:has-[.accordion-card:nth-child(2):hover]:bg-[#0d120f] lg:has-[.accordion-card:nth-child(3):hover]:bg-[#100f13] lg:has-[.accordion-card:nth-child(4):hover]:bg-[#13120d]"
+      className="collections-section flex flex-col justify-between py-20 px-6 sm:px-8 lg:px-16 relative overflow-hidden bg-[#faf8f5] min-h-screen h-auto lg:h-screen lg:max-h-screen lg:pt-[8vh] lg:pb-[14vh] transition-colors duration-1000 ease-[cubic-bezier(0.16,1,0.3,1)] z-[2]"
     >
       {/* Tactile Noise/Grain Overlay */}
       <div 
@@ -146,14 +134,14 @@ export default function Collections() {
       {/* Elegant Museum Header */}
       <div className="collections-header-wrapper flex flex-col items-center mb-16 z-20">
         <div className="header-eyebrow flex items-center gap-3 mb-4">
-          <span className="w-1 h-1 rounded-full bg-white/40" />
-          <span className="text-white/40 text-[9px] font-semibold tracking-[0.4em] uppercase">
+          <span className="w-1 h-1 rounded-full bg-purple/30" />
+          <span className="text-purple/50 text-[9px] font-bold tracking-[0.4em] uppercase">
             Curated Exhibitions
           </span>
-          <span className="w-1 h-1 rounded-full bg-white/40" />
+          <span className="w-1 h-1 rounded-full bg-purple/30" />
         </div>
         
-        <h2 className="collections-title text-4xl sm:text-5xl lg:text-[2.8rem] font-serif text-white font-extralight tracking-[0.2em] uppercase text-center">
+        <h2 className="collections-title text-4xl sm:text-5xl lg:text-[2.8rem] font-serif text-[#0e0c0b] font-extralight tracking-[0.2em] uppercase text-center">
           <SplitText
             text="OUR COLLECTIONS"
             tag="span"
@@ -170,7 +158,7 @@ export default function Collections() {
       </div>
 
       {/* Grid Container */}
-      <div className="accordion-container w-full max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 items-stretch z-20 min-h-[460px] md:min-h-auto md:mb-[50px] group/container transition-all duration-[600ms] ease-[cubic-bezier(0.16,1,0.3,1)]">
+      <div className="collections-grid-container w-full max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 items-stretch z-20 min-h-[460px] md:min-h-auto md:mb-[50px] group/container transition-all duration-[600ms] ease-[cubic-bezier(0.16,1,0.3,1)]">
         {collectionsData.map((item, index) => (
           <CollectionCard
             key={index}

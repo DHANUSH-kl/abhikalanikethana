@@ -209,7 +209,7 @@ export default function ArtworksCatalog() {
   }, [searchQuery]);
 
   const handleWhatsAppEnquiry = (artwork: Artwork) => {
-    const ownerNumber = "919876543210"; // Gallery WhatsApp account
+    const ownerNumber = "919916163965"; // Gallery WhatsApp account
     const baseText = `Hello Abhikalaanikethana, I am interested in inquiring about the original artwork:
   
 • Title: "${artwork.title}"
