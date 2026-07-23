@@ -67,10 +67,10 @@ export default function AboutSection() {
       <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 grid grid-cols-1 lg:grid-cols-12 gap-16 items-center relative z-10">
         
         {/* Left Column: Orbiting Images Canvas Collage (6 spans of 12) */}
-        <div className="lg:col-span-6 relative flex items-center justify-center lg:justify-start min-h-[500px] w-full">
+        <div className="lg:col-span-6 relative flex items-center justify-center lg:justify-start min-h-[240px] sm:min-h-[380px] lg:min-h-[500px] w-full">
           
           {/* Wide Ellipse Orbit (Clean, no centerpiece, showing paths) */}
-          <div className="orbit-visual-wrapper w-full lg:w-[115%] lg:-ml-[8%] aspect-square relative z-10">
+          <div className="orbit-visual-wrapper w-full lg:w-[115%] lg:-ml-[8%] aspect-[16/10] lg:aspect-square relative z-10">
             <OrbitImages
               images={orbitImagesList}
               shape="ellipse"

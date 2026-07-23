@@ -1,360 +1,119 @@
 "use client";
 
-import React, { useState, useRef, useEffect } from "react";
+import React, { useRef } from "react";
 import Image from "next/image";
-import { Search, MessageCircle } from "lucide-react";
-import { gsap } from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { useGSAP } from "@gsap/react";
-
-gsap.registerPlugin(ScrollTrigger, useGSAP);
-
-interface Artwork {
-  id: string;
-  title: string;
-  theme: string;
-  medium: string;
-  size: string;
-  year: string;
-  price: string;
-  imageSrc: string;
-  accentColor: string;
-}
-
-const artworksData: Artwork[] = [
-  {
-    id: "art-1",
-    title: "Solitude's Echo",
-    theme: "HUMAN EXPRESSIONS",
-    medium: "Mixed Media & Gesso on Canvas",
-    size: "120 x 150 cm",
-    year: "2026",
-    price: "Price on Request",
-    imageSrc: "/painting_expressions.png",
-    accentColor: "#D66853", // Terracotta
-  },
-  {
-    id: "art-2",
-    title: "Tectonic Balance",
-    theme: "FORM & BALANCE",
-    medium: "Acrylic & Marble Dust on Canvas",
-    size: "100 x 100 cm",
-    year: "2025",
-    price: "Price on Request",
-    imageSrc: "/painting_balance.png",
-    accentColor: "#5D7A68", // Sage Green
-  },
-  {
-    id: "art-3",
-    title: "Subconscious Dreamscape",
-    theme: "INNER JOURNEYS",
-    medium: "Oil & Charcoal on Canvas",
-    size: "140 x 180 cm",
-    year: "2026",
-    price: "Price on Request",
-    imageSrc: "/painting_journeys.png",
-    accentColor: "#7B6F8E", // Amethyst Purple
-  },
-  {
-    id: "art-4",
-    title: "Minimal Horizon",
-    theme: "SILENT STORIES",
-    medium: "Oil Pastels & Graphite on Heavy Canvas",
-    size: "90 x 120 cm",
-    year: "2026",
-    price: "Price on Request",
-    imageSrc: "/painting_stories.png",
-    accentColor: "#E2B13C", // Ochre Yellow
-  },
-  {
-    id: "art-5",
-    title: "Vessel of Whispers",
-    theme: "HUMAN EXPRESSIONS",
-    medium: "Oil, Sand & Charcoal on Canvas",
-    size: "110 x 140 cm",
-    year: "2026",
-    price: "Price on Request",
-    imageSrc: "/gallery_interior.png",
-    accentColor: "#D66853",
-  },
-  {
-    id: "art-6",
-    title: "Monolithic Void",
-    theme: "SILENT STORIES",
-    medium: "Charcoal & High-Texture Paste",
-    size: "150 x 200 cm",
-    year: "2026",
-    price: "Price on Request",
-    imageSrc: "/hero_painting.png",
-    accentColor: "#2e2824",
-  }
-];
-
-const categoryData = [
-  { label: "All Works", id: "All" },
-  { label: "Human Expressions", id: "HUMAN EXPRESSIONS" },
-  { label: "Form & Balance", id: "FORM & BALANCE" },
-  { label: "Inner Journeys", id: "INNER JOURNEYS" },
-  { label: "Silent Stories", id: "SILENT STORIES" }
-];
+import Link from "next/link";
+import { ArrowRight, Sparkles } from "lucide-react";
 
 export default function ArtworksCatalog() {
   const containerRef = useRef<HTMLDivElement>(null);
-  const cardsContainerRef = useRef<HTMLDivElement>(null);
-  
-  const [activeFilter, setActiveFilter] = useState("All");
-  const [filteredItems, setFilteredItems] = useState<Artwork[]>(artworksData);
-  const [searchQuery, setSearchQuery] = useState("");
-
-  // Coordinated ScrollTrigger timeline entrance
-  useGSAP(
-    () => {
-      const tl = gsap.timeline({
-        scrollTrigger: {
-          trigger: containerRef.current,
-          start: "top 75%",
-          once: true,
-        }
-      });
-
-      // 1. Header elements stagger
-      tl.fromTo(
-        ".catalog-header-item",
-        { y: 30, opacity: 0 },
-        { y: 0, opacity: 1, stagger: 0.12, duration: 0.8, ease: "power3.out" }
-      );
-
-      // 2. Filter buttons stagger
-      tl.fromTo(
-        ".catalog-filter-btn",
-        { scale: 0.95, opacity: 0 },
-        { scale: 1, opacity: 1, stagger: 0.05, duration: 0.6, ease: "power3.out" },
-        "-=0.5" // overlap with header reveal
-      );
-
-      // 3. Stagger cards
-      tl.fromTo(
-        ".catalog-card-scroll",
-        { y: 50, opacity: 0 },
-        { y: 0, opacity: 1, stagger: 0.12, duration: 1.0, ease: "power3.out" },
-        "-=0.5"
-      );
-    },
-    { scope: containerRef }
-  );
-
-  // Trigger smooth switch animation on filter change
-  const handleFilterSelect = (filterId: string) => {
-    if (filterId === activeFilter && searchQuery === "") return;
-
-    gsap.to(".catalog-card", {
-      opacity: 0,
-      y: 20,
-      scale: 0.97,
-      duration: 0.25,
-      stagger: 0.04,
-      ease: "power2.in",
-      onComplete: () => {
-        setActiveFilter(filterId);
-        
-        // Filter elements
-        let items = artworksData;
-        if (filterId !== "All") {
-          items = items.filter(item => item.theme === filterId);
-        }
-        if (searchQuery.trim() !== "") {
-          items = items.filter(item => 
-            item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            item.medium.toLowerCase().includes(searchQuery.toLowerCase())
-          );
-        }
-        
-        setFilteredItems(items);
-
-        // Animate new elements in
-        gsap.fromTo(
-          ".catalog-card",
-          {
-            opacity: 0,
-            y: 35,
-            scale: 0.95,
-          },
-          {
-            opacity: 1,
-            y: 0,
-            scale: 1,
-            stagger: 0.06,
-            duration: 0.55,
-            ease: "power3.out",
-          }
-        );
-      }
-    });
-  };
-
-  // Perform search
-  useEffect(() => {
-    let items = artworksData;
-    if (activeFilter !== "All") {
-      items = items.filter(item => item.theme === activeFilter);
-    }
-    if (searchQuery.trim() !== "") {
-      items = items.filter(item => 
-        item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        item.medium.toLowerCase().includes(searchQuery.toLowerCase())
-      );
-    }
-    setFilteredItems(items);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchQuery]);
-
-  const handleWhatsAppEnquiry = (artwork: Artwork) => {
-    const ownerNumber = "919916163965"; // Gallery WhatsApp account
-    const baseText = `Hello Abhikalaanikethana, I am interested in inquiring about the original artwork:
-  
-• Title: "${artwork.title}"
-• Category: ${artwork.theme}
-• Medium: ${artwork.medium}
-• Size: ${artwork.size}
-• Year: ${artwork.year}
-
-Please share pricing and acquisition details.`;
-
-    const encodedText = encodeURIComponent(baseText);
-    const waUrl = `https://wa.me/${ownerNumber}?text=${encodedText}`;
-    window.open(waUrl, "_blank", "noopener,noreferrer");
-  };
 
   return (
-    <section ref={containerRef} id="exhibition" className="py-24 px-6 sm:px-8 lg:px-16 bg-[#faf8f5] relative overflow-hidden z-[2] border-t border-purple/10">
-      
-      {/* Editorial Header */}
-      <div className="max-w-7xl mx-auto flex flex-col md:flex-row md:items-end justify-between gap-8 mb-16">
-        <div className="max-w-xl">
-          <div className="catalog-header-item flex items-center gap-2 text-green font-sans font-bold text-[10px] tracking-[0.3em] uppercase mb-4">
-            <span className="w-1.5 h-1.5 rounded-full bg-green" />
+    <section ref={containerRef} id="categories" className="py-24 px-6 sm:px-8 lg:px-16 bg-[#faf8f5] relative overflow-hidden z-[2] border-t border-purple/10">
+      {/* Tactile Overlay */}
+      <div 
+        className="absolute inset-0 pointer-events-none z-10 opacity-[0.035]" 
+        style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3e%3cfilter id='noise'%3e%3cfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='3' stitchTiles='stitch'/%3e%3c/filter%3e%3crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3e%3c/svg%3e")` }}
+      />
+
+      <div className="max-w-7xl mx-auto relative z-20">
+        
+        {/* Header */}
+        <div className="flex flex-col items-center text-center mb-16 max-w-2xl mx-auto">
+          <div className="flex items-center gap-2 text-[#A9D03F] font-sans font-bold text-xs tracking-[0.3em] uppercase mb-3">
+            <Sparkles size={16} className="text-[#A9D03F]" />
             Acquisitions Catalogue
           </div>
-          <h2 className="catalog-header-item font-serif text-4xl sm:text-5xl text-terracotta leading-tight mb-4">
+          <h2 className="font-serif text-3xl sm:text-5xl text-[#F36C1E] uppercase font-light tracking-wide mb-4">
             Acquire Original Abstract Art
           </h2>
-          <p className="catalog-header-item text-text-muted text-sm leading-relaxed">
-            Browse our current gallery pieces available for direct placement. Each piece is an authentic original complete with a Certificate of Authenticity. Click enquire to connect directly with the gallery manager via WhatsApp.
+          <p className="text-[#5e544e] text-sm sm:text-base font-normal leading-relaxed">
+            Select a dedicated category below to explore our museum-grade collections. Experience smooth continuous moving artwork showcases and inquire directly via WhatsApp.
           </p>
         </div>
 
-        {/* Search Field */}
-        <div className="catalog-header-item relative w-full max-w-xs flex-shrink-0">
-          <input
-            type="text"
-            placeholder="Search by title, medium..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full bg-white border border-text-dark/10 pl-10 pr-4 py-2.5 rounded-full text-xs font-sans focus:outline-none focus:border-terracotta transition-colors duration-300 shadow-[0_4px_12px_rgba(0,0,0,0.02)]"
-          />
-          <Search size={14} className="absolute left-4 top-1/2 -translate-y-1/2 text-text-muted/60" />
-        </div>
-      </div>
-
-      {/* Filter Row */}
-      <div className="max-w-7xl mx-auto mb-12 flex flex-wrap gap-2.5 items-center overflow-x-auto pb-2 scrollbar-none">
-        {categoryData.map((category) => {
-          const isActive = activeFilter === category.id;
-          return (
-            <button
-              key={category.id}
-              onClick={() => handleFilterSelect(category.id)}
-              className={`catalog-filter-btn px-5 py-2.5 rounded-full text-[10px] font-sans font-bold uppercase tracking-widest transition-all duration-300 cursor-pointer ${
-                isActive 
-                  ? "bg-text-dark text-[#faf8f5] shadow-md shadow-text-dark/15 scale-95" 
-                  : "bg-white text-text-muted border border-text-dark/5 hover:border-text-dark/20 hover:text-text-dark"
-              }`}
-            >
-              {category.label}
-            </button>
-          );
-        })}
-      </div>
-
-      {/* Artworks Grid */}
-      <div className="catalog-cards-wrapper max-w-7xl mx-auto">
-        {filteredItems.length > 0 ? (
-          <div ref={cardsContainerRef} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-            {filteredItems.map((art) => (
-              <div
-                key={art.id}
-                className="catalog-card catalog-card-scroll bg-white border border-text-dark/5 p-4 rounded-[28px] shadow-[0_15px_30px_rgba(46,40,36,0.02)] transition-all duration-500 hover:shadow-[0_25px_50px_rgba(46,40,36,0.06)] hover:-translate-y-1.5 flex flex-col justify-between"
-              >
-                {/* Artwork Framed Cover */}
-                <div>
-                  <div className="relative w-full aspect-[4/5] rounded-[20px] overflow-hidden bg-bg-cream mb-5 group/img border border-text-dark/5">
-                    <Image
-                      src={art.imageSrc}
-                      alt={art.title}
-                      fill
-                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                      className="object-cover transition-transform duration-[1200ms] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover/img:scale-105"
-                    />
-                    <div className="absolute inset-0 bg-[#0e0c0b]/5 opacity-0 group-hover/img:opacity-100 transition-opacity duration-500" />
-                    
-                    {/* Size tag floating inside image */}
-                    <div className="absolute top-4 right-4 bg-white/95 backdrop-blur-sm border border-text-dark/5 px-3 py-1.5 rounded-full text-[9px] font-mono font-semibold text-text-dark uppercase tracking-wider shadow-sm">
-                      {art.size}
-                    </div>
-                  </div>
-
-                  {/* Title & Collection tag */}
-                  <div className="px-1.5">
-                    <div className="flex items-center gap-2 mb-1.5">
-                      <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: art.accentColor }} />
-                      <span className="text-[9px] font-mono font-bold tracking-wider text-text-muted uppercase">
-                        {art.theme}
-                      </span>
-                    </div>
-                    <h3 className="font-serif text-lg text-text-dark leading-tight uppercase font-medium">
-                      {art.title}
-                    </h3>
-                    <p className="text-text-muted/80 text-xs font-light mt-2 line-clamp-2 leading-relaxed">
-                      {art.medium} • {art.year}
-                    </p>
-                  </div>
-                </div>
-
-                {/* Card Action footer */}
-                <div className="mt-6 pt-4 border-t border-text-dark/5 flex items-center justify-between px-1.5">
-                  <div className="flex flex-col">
-                    <span className="text-[9px] font-mono tracking-widest text-text-muted uppercase mb-0.5">Availability</span>
-                    <span className="text-xs font-bold text-terracotta font-mono uppercase tracking-wide">{art.price}</span>
-                  </div>
-                  
-                  <button
-                    onClick={() => handleWhatsAppEnquiry(art)}
-                    className="inline-flex items-center gap-2 bg-[#25D366] text-white hover:bg-[#20ba59] transition-all duration-300 font-sans font-bold text-[10px] tracking-widest uppercase py-3 px-5 rounded-full shadow-lg shadow-[#25D366]/15 hover:shadow-[#25D366]/25 hover:scale-[1.03] cursor-pointer"
-                  >
-                    <MessageCircle size={14} className="fill-white stroke-none" />
-                    Enquire
-                  </button>
-                </div>
-
+        {/* 2 Category Showcase Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12">
+          
+          {/* ABSTRACT CATEGORY CARD */}
+          <Link 
+            href="/collections/abstract"
+            className="group relative overflow-hidden rounded-[32px] bg-white border border-stone-200/80 shadow-md transition-all duration-700 hover:-translate-y-2 hover:shadow-2xl flex flex-col"
+          >
+            <div className="relative w-full aspect-[4/3] overflow-hidden bg-[#f0eae1]">
+              <Image
+                src="/painting_expressions.png"
+                alt="Abstract Art Collection"
+                fill
+                sizes="(max-width: 768px) 100vw, 50vw"
+                className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+                priority
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent opacity-80 group-hover:opacity-60 transition-opacity" />
+              
+              {/* Badge */}
+              <div className="absolute top-6 left-6 bg-white/95 backdrop-blur-md px-4 py-2 rounded-full text-xs font-semibold text-[#F36C1E] tracking-wider uppercase shadow-sm">
+                Vibrant Abstract
               </div>
-            ))}
-          </div>
-        ) : (
-          <div className="py-20 text-center border border-dashed border-text-dark/10 rounded-[28px]">
-            <p className="text-text-muted text-sm font-light">No works match your current filters.</p>
-            <button
-              onClick={() => {
-                setActiveFilter("All");
-                setSearchQuery("");
-              }}
-              className="mt-4 text-xs font-bold text-terracotta underline"
-            >
-              Reset Filters
-            </button>
-          </div>
-        )}
-      </div>
+            </div>
 
+            <div className="p-8 flex items-center justify-between bg-white flex-grow">
+              <div>
+                <h3 className="font-serif text-2xl sm:text-3xl font-semibold text-[#2e2824] uppercase tracking-wide mb-2 group-hover:text-[#F36C1E] transition-colors">
+                  Abstract Collection
+                </h3>
+                <p className="text-xs text-[#5e544e] font-medium uppercase tracking-widest">
+                  Explore Hand-Painted Vibrant Originals &rarr;
+                </p>
+              </div>
+
+              <div className="w-12 h-12 rounded-full bg-[#F36C1E] text-white flex items-center justify-center transition-transform duration-300 group-hover:translate-x-1.5 flex-shrink-0">
+                <ArrowRight size={20} />
+              </div>
+            </div>
+          </Link>
+
+          {/* BLACK & WHITE CATEGORY CARD */}
+          <Link 
+            href="/collections/black-and-white"
+            className="group relative overflow-hidden rounded-[32px] bg-white border border-stone-200/80 shadow-md transition-all duration-700 hover:-translate-y-2 hover:shadow-2xl flex flex-col"
+          >
+            <div className="relative w-full aspect-[4/3] overflow-hidden bg-[#1a1a1a]">
+              <Image
+                src="/black and white collection/IMG_4056.PNG"
+                alt="Black and White Art Collection"
+                fill
+                sizes="(max-width: 768px) 100vw, 50vw"
+                className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+                priority
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent opacity-80 group-hover:opacity-60 transition-opacity" />
+              
+              {/* Badge */}
+              <div className="absolute top-6 left-6 bg-white/95 backdrop-blur-md px-4 py-2 rounded-full text-xs font-semibold text-[#2e2824] tracking-wider uppercase shadow-sm">
+                Monochrome Noir
+              </div>
+            </div>
+
+            <div className="p-8 flex items-center justify-between bg-white flex-grow">
+              <div>
+                <h3 className="font-serif text-2xl sm:text-3xl font-semibold text-[#2e2824] uppercase tracking-wide mb-2 group-hover:text-[#F36C1E] transition-colors">
+                  Black &amp; White Collection
+                </h3>
+                <p className="text-xs text-[#5e544e] font-medium uppercase tracking-widest">
+                  Explore High-Contrast Monochromatic Art &rarr;
+                </p>
+              </div>
+
+              <div className="w-12 h-12 rounded-full bg-[#2e2824] text-white flex items-center justify-center transition-transform duration-300 group-hover:translate-x-1.5 flex-shrink-0">
+                <ArrowRight size={20} />
+              </div>
+            </div>
+          </Link>
+
+        </div>
+
+      </div>
     </section>
   );
 }

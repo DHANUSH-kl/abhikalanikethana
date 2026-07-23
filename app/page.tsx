@@ -9,6 +9,7 @@ import FoundersSection from "@/components/FoundersSection";
 import StatsSection from "@/components/StatsSection";
 import ArtworksCatalog from "@/components/ArtworksCatalog";
 import RecentlyAcquired from "@/components/RecentlyAcquired";
+import TestimonialsSection from "@/components/TestimonialsSection";
 import Features from "@/components/Features";
 import FAQSection from "@/components/FAQSection";
 import Footer from "@/components/Footer";
@@ -25,6 +26,7 @@ export default function Home() {
         <StatsSection />
         <ArtworksCatalog />
         <RecentlyAcquired />
+        <TestimonialsSection />
         <Features />
         <FAQSection />
       </main>

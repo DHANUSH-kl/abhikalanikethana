@@ -1,21 +1,21 @@
 @import "tailwindcss";
 
 @theme {
-  --color-terracotta: #c05c3c;
-  --color-terracotta-rgb: 192, 92, 60;
-  --color-purple: #a890c2;
-  --color-purple-rgb: 168, 144, 194;
-  --color-green: #8a9a3e;
-  --color-green-rgb: 138, 154, 62;
-  --color-yellow: #f3c246;
-  --color-yellow-rgb: 243, 194, 70;
+  --color-terracotta: #F36C1E;
+  --color-terracotta-rgb: 243, 108, 30;
+  --color-purple: #D75CEE;
+  --color-purple-rgb: 215, 92, 238;
+  --color-green: #A9D03F;
+  --color-green-rgb: 169, 208, 63;
+  --color-yellow: #FFCF21;
+  --color-yellow-rgb: 255, 207, 33;
   --color-bg-cream: #fcfaf6;
   --color-text-dark: #2e2824;
   --color-text-muted: #5e544e;
 
-  --font-serif: var(--font-cormorant), "Playfair Display", Georgia, serif;
-  --font-sans: var(--font-jakarta), "Inter", Helvetica, Arial, sans-serif;
-  --font-script: var(--font-caveat), "Caveat", cursive;
+  --font-serif: var(--font-league-spartan), "League Spartan", sans-serif;
+  --font-sans: var(--font-league-spartan), "League Spartan", sans-serif;
+  --font-script: var(--font-league-spartan), "League Spartan", sans-serif;
 
   --transition-smooth: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
   --transition-fast: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
@@ -27,18 +27,18 @@
     --text-dark: #2e2824;
     --text-muted: #5e544e;
     
-    --color-terracotta: #c05c3c;
-    --color-terracotta-rgb: 192, 92, 60;
-    --color-purple: #a890c2;
-    --color-purple-rgb: 168, 144, 194;
-    --color-green: #8a9a3e;
-    --color-green-rgb: 138, 154, 62;
-    --color-yellow: #f3c246;
-    --color-yellow-rgb: 243, 194, 70;
+    --color-terracotta: #F36C1E;
+    --color-terracotta-rgb: 243, 108, 30;
+    --color-purple: #D75CEE;
+    --color-purple-rgb: 215, 92, 238;
+    --color-green: #A9D03F;
+    --color-green-rgb: 169, 208, 63;
+    --color-yellow: #FFCF21;
+    --color-yellow-rgb: 255, 207, 33;
     
-    --font-serif: var(--font-cormorant), "Playfair Display", Georgia, serif;
-    --font-sans: var(--font-jakarta), "Inter", Helvetica, Arial, sans-serif;
-    --font-script: var(--font-caveat), "Caveat", cursive;
+    --font-serif: var(--font-league-spartan), "League Spartan", sans-serif;
+    --font-sans: var(--font-league-spartan), "League Spartan", sans-serif;
+    --font-script: var(--font-league-spartan), "League Spartan", sans-serif;
     
     --transition-smooth: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
     --transition-fast: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
@@ -56,6 +56,7 @@
   }
 
   body {
+    font-family: var(--font-sans);
     overflow-x: hidden;
     position: relative;
     min-height: 100vh;
@@ -63,12 +64,13 @@
 
   h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-serif);
-    font-weight: 500;
+    font-weight: 600;
     line-height: 1.15;
     letter-spacing: -0.01em;
   }
 
   p {
+    font-family: var(--font-sans);
     line-height: 1.6;
     color: var(--text-muted);
   }
@@ -332,4 +334,23 @@
   -webkit-text-fill-color: transparent;
   animation: shine 4s linear infinite;
   display: inline-block;
+}
+
+@keyframes marqueeL2R {
+  0% {
+    transform: translateX(-50%);
+  }
+  100% {
+    transform: translateX(0%);
+  }
+}
+
+.animate-marquee-l2r {
+  display: flex;
+  width: max-content;
+  animation: marqueeL2R 30s linear infinite;
+}
+
+.animate-marquee-l2r:hover {
+  animation-play-state: paused;
 }

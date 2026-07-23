@@ -2,18 +2,20 @@
 
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
+import Link from "next/link";
+import { Menu, X } from "lucide-react";
 
 export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [activeSection, setActiveSection] = useState("home");
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 50);
 
-      // Track active section for underline updates
-      const sections = ["home", "about", "collections", "footer"];
-      const scrollPos = window.scrollY + 100;
+      const sections = ["home", "about", "collections", "founder", "categories", "testimonials", "footer"];
+      const scrollPos = window.scrollY + 120;
       
       for (const section of sections) {
         const el = document.getElementById(section);
@@ -32,50 +34,56 @@ export default function Navbar() {
   }, []);
 
   const handleSmoothScroll = (e: React.MouseEvent<HTMLAnchorElement>, id: string) => {
+    // If not on homepage (e.g., category or product detail page), normal link navigation handles it
+    if (window.location.pathname !== "/") {
+      return;
+    }
     e.preventDefault();
+    setIsMobileMenuOpen(false);
     const element = document.getElementById(id);
     if (element) {
-      const yOffset = -90; // offset for sticky navbar
+      const yOffset = -80;
       const y = element.getBoundingClientRect().top + window.scrollY + yOffset;
       window.scrollTo({ top: y, behavior: "smooth" });
     }
   };
 
   const navLinks = [
-    { label: "HOME", id: "home" },
-    { label: "ABOUT", id: "about" },
-    { label: "GALLERY", id: "collections" },
-    { label: "ARTISTS", id: "about" },
-    { label: "BLOG", id: "footer" },
-    { label: "CONTACT", id: "footer" },
+    { label: "HOME", id: "home", href: "/#home" },
+    { label: "ABOUT", id: "about", href: "/#about" },
+    { label: "SIGNATURES", id: "collections", href: "/#collections" },
+    { label: "ARTIST", id: "founder", href: "/#founder" },
+    { label: "CATEGORIES", id: "categories", href: "/#categories" },
+    { label: "REVIEWS", id: "testimonials", href: "/#testimonials" },
+    { label: "CONTACT", id: "footer", href: "/#footer" },
   ];
 
   return (
-    <header className={`fixed top-0 left-0 w-full z-[1000] px-[8%] py-6 transition-all duration-[800ms] ease-[cubic-bezier(0.16,1,0.3,1)] bg-transparent min-[901px]:px-[8%] max-[900px]:px-[5%] max-[900px]:py-4 ${isScrolled ? "py-4 bg-[#fcfaf6]/85 backdrop-blur-[15px] shadow-[0_4px_30px_rgba(0,0,0,0.03)] border-b border-purple/10 max-[900px]:py-3" : ""}`}>
+    <header className={`fixed top-0 left-0 w-full z-[1000] px-[6%] lg:px-[8%] py-5 transition-all duration-500 ease-out ${isScrolled ? "py-3 bg-[#fcfaf6]/90 backdrop-blur-md shadow-sm border-b border-[#D75CEE]/10" : "bg-transparent"}`}>
       <div className="max-w-[1400px] mx-auto flex items-center justify-between">
         {/* Brand Logo */}
-        <a href="#home" onClick={(e) => handleSmoothScroll(e, "home")} className="flex items-center group">
+        <Link href="/" className="flex items-center group">
           <Image
             src="/Abhikalaanikethana Logo Transperent.png"
             alt="Abhikalaanikethana Logo"
-            width={280}
-            height={56}
-            className="h-14 w-auto object-contain transition-transform duration-300 ease-out group-hover:scale-[1.02]"
+            width={240}
+            height={50}
+            className="h-10 sm:h-12 w-auto object-contain transition-transform duration-300 group-hover:scale-[1.02]"
             priority
           />
-        </a>
+        </Link>
 
         {/* Desktop Navigation Links */}
-        <nav className="hidden min-[901px]:flex items-center gap-8">
+        <nav className="hidden lg:flex items-center gap-7">
           {navLinks.map((link, idx) => {
             const isActive = activeSection === link.id;
             return (
               <a
                 key={idx}
-                href={`#${link.id}`}
+                href={link.href}
                 onClick={(e) => handleSmoothScroll(e, link.id)}
-                className={`font-sans text-[0.75rem] font-semibold tracking-[0.15em] text-text-dark relative py-2 after:content-[''] after:absolute after:bottom-0 after:left-0 after:h-[1.5px] after:bg-terracotta after:transition-all after:duration-300 after:ease-out ${
-                  isActive ? "after:w-full" : "after:w-0 hover:after:w-full"
+                className={`font-sans text-[11px] font-medium tracking-[0.18em] uppercase text-text-dark/85 hover:text-terracotta relative py-1.5 transition-colors duration-200 after:content-[''] after:absolute after:bottom-0 after:left-0 after:h-[1.5px] after:bg-[#F36C1E] after:transition-all after:duration-300 ${
+                  isActive ? "after:w-full text-[#F36C1E]" : "after:w-0 hover:after:w-full"
                 }`}
               >
                 {link.label}
@@ -84,10 +92,50 @@ export default function Navbar() {
           })}
         </nav>
 
-        {/* Action Button */}
-        <a href="#footer" onClick={(e) => handleSmoothScroll(e, "footer")} className="btn-pill btn-terracotta text-[0.75rem] py-2.5 px-6">
-          INQUIRE
-        </a>
+        {/* Desktop Action CTA & Mobile Menu Toggle */}
+        <div className="flex items-center gap-4">
+
+          {/* Mobile Hamburger Button */}
+          <button
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            className="lg:hidden p-2 text-text-dark hover:text-[#F36C1E] transition-colors focus:outline-none"
+            aria-label="Toggle Navigation Menu"
+          >
+            {isMobileMenuOpen ? <X size={26} /> : <Menu size={26} />}
+          </button>
+        </div>
+      </div>
+
+      {/* Mobile Drawer Overlay */}
+      <div
+        className={`fixed inset-0 top-[70px] bg-[#fcfaf6] z-[999] flex flex-col px-8 py-8 transition-all duration-300 ease-in-out lg:hidden border-t border-[#D75CEE]/10 shadow-xl ${
+          isMobileMenuOpen ? "opacity-100 translate-y-0 pointer-events-auto" : "opacity-0 -translate-y-4 pointer-events-none"
+        }`}
+      >
+        <nav className="flex flex-col gap-6 my-auto">
+          {navLinks.map((link, idx) => (
+            <a
+              key={idx}
+              href={link.href}
+              onClick={(e) => handleSmoothScroll(e, link.id)}
+              className="font-sans text-base font-medium tracking-[0.2em] uppercase text-text-dark hover:text-[#F36C1E] pb-2 border-b border-stone-200/60"
+            >
+              {link.label}
+            </a>
+          ))}
+        </nav>
+        <div className="mt-8 flex flex-col gap-4">
+          <a
+            href="/#footer"
+            onClick={(e) => {
+              setIsMobileMenuOpen(false);
+              handleSmoothScroll(e, "footer");
+            }}
+            className="btn-pill bg-[#F36C1E] text-white text-center justify-center text-xs py-3 w-full"
+          >
+            INQUIRE NOW
+          </a>
+        </div>
       </div>
     </header>
   );
