@@ -114,8 +114,17 @@ export default function Collections() {
           animation: marqueeL2R 22s linear infinite;
           will-change: transform;
         }
-        .signatures-ticker-container:hover {
-          animation-play-state: paused;
+        /* Only pause on hover for desktop (non-touch) */
+        @media (min-width: 769px) {
+          .signatures-ticker-container:hover {
+            animation-play-state: paused;
+          }
+        }
+        /* On mobile, disable pointer events so taps don't stop the marquee */
+        @media (max-width: 768px) {
+          .signatures-ticker-container {
+            pointer-events: none;
+          }
         }
       `}</style>
 

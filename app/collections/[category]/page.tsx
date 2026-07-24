@@ -1,6 +1,6 @@
 "use client";
 
-import React, { use } from "react";
+import React, { use, useEffect, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import Navbar from "@/components/Navbar";
@@ -18,6 +18,7 @@ interface CategoryPageProps {
 export default function CategoryPage({ params }: CategoryPageProps) {
   const resolvedParams = use(params);
   const rawCategory = resolvedParams.category;
+  const mobileGridRef = useRef<HTMLDivElement>(null);
   
   const categoryKey = rawCategory === "black-and-white" ? "black-and-white" : "abstract";
   const categoryTitle = categoryKey === "black-and-white" ? "Black & White Collection" : "Abstract Collection";
@@ -27,8 +28,30 @@ export default function CategoryPage({ params }: CategoryPageProps) {
 
   const artworks: Artwork[] = getArtworksByCategory(categoryKey);
 
-  // Duplicate cards for infinite seamless marquee loop
+  // Duplicate cards for infinite seamless marquee loop (desktop only)
   const marqueeList = [...artworks, ...artworks, ...artworks];
+
+  // Intersection Observer for mobile grid scroll-reveal animations
+  useEffect(() => {
+    if (!mobileGridRef.current) return;
+    const cards = mobileGridRef.current.querySelectorAll('.mobile-reveal-card');
+    if (!cards.length) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            (entry.target as HTMLElement).classList.add('revealed');
+            observer.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.15, rootMargin: '0px 0px -40px 0px' }
+    );
+
+    cards.forEach((card) => observer.observe(card));
+    return () => observer.disconnect();
+  }, [artworks]);
 
   return (
     <main className="min-h-screen bg-[#faf8f5] text-[#2e2824] flex flex-col font-sans">
@@ -57,10 +80,12 @@ export default function CategoryPage({ params }: CategoryPageProps) {
         </div>
       </section>
 
-      {/* INFINITE MOVING CARDS CAROUSEL (LEFT TO RIGHT) */}
-      <section className="py-20 overflow-hidden relative">
+      {/* ============================================================
+          DESKTOP: Infinite Moving Cards Marquee (hidden on mobile)
+          ============================================================ */}
+      <section className="py-20 overflow-hidden relative hidden md:block">
         <style>{`
-          @keyframes marqueeL2R {
+          @keyframes categoryMarqueeL2R {
             0% {
               transform: translate3d(-50%, 0, 0);
             }
@@ -71,7 +96,7 @@ export default function CategoryPage({ params }: CategoryPageProps) {
           .category-ticker-container {
             display: flex;
             width: max-content;
-            animation: marqueeL2R 25s linear infinite;
+            animation: categoryMarqueeL2R 25s linear infinite;
             will-change: transform;
           }
           .category-ticker-container:hover {
@@ -89,25 +114,22 @@ export default function CategoryPage({ params }: CategoryPageProps) {
         {/* Ticker Wrapper */}
         <div className="w-full overflow-hidden py-6 relative">
           {/* Soft responsive edge blur and fade gradients */}
-          <div className="absolute left-0 top-0 bottom-0 w-6 sm:w-24 md:w-32 bg-gradient-to-r from-[#faf8f5] to-transparent pointer-events-none z-30 backdrop-blur-[0.5px] sm:backdrop-blur-[2px]" />
-          <div className="absolute right-0 top-0 bottom-0 w-6 sm:w-24 md:w-32 bg-gradient-to-l from-[#faf8f5] to-transparent pointer-events-none z-30 backdrop-blur-[0.5px] sm:backdrop-blur-[2px]" />
+          <div className="absolute left-0 top-0 bottom-0 w-24 md:w-32 bg-gradient-to-r from-[#faf8f5] to-transparent pointer-events-none z-30 backdrop-blur-[2px]" />
+          <div className="absolute right-0 top-0 bottom-0 w-24 md:w-32 bg-gradient-to-l from-[#faf8f5] to-transparent pointer-events-none z-30 backdrop-blur-[2px]" />
 
           <div className="category-ticker-container flex gap-6 px-4">
             {marqueeList.map((art, index) => (
               <Link
                 key={`${art.id}-${index}`}
                 href={`/artwork/${categoryKey}/${art.id}`}
-                className="w-[280px] sm:w-[320px] lg:w-[360px] flex-shrink-0 group cursor-pointer relative transition-all duration-500 rounded-[28px] bg-white p-4 border border-stone-200/80 shadow-md hover:shadow-2xl hover:-translate-y-2
-                  /* Mobile Blur Effect: side cards softened, center card focused */
-                  max-sm:[&:not(:nth-child(2n))]:blur-[1.5px] max-sm:[&:not(:nth-child(2n))]:opacity-75
-                "
+                className="w-[320px] lg:w-[360px] flex-shrink-0 group cursor-pointer relative transition-all duration-500 rounded-[28px] bg-white p-4 border border-stone-200/80 shadow-md hover:shadow-2xl hover:-translate-y-2"
               >
                 <div className="relative w-full aspect-[3/4] rounded-[20px] overflow-hidden bg-stone-100 mb-4 border border-stone-200/50">
                   <Image
                     src={art.imageSrc}
                     alt={art.title}
                     fill
-                    sizes="(max-width: 640px) 280px, 360px"
+                    sizes="360px"
                     className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
                   />
                   
@@ -133,6 +155,65 @@ export default function CategoryPage({ params }: CategoryPageProps) {
               </Link>
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* ============================================================
+          MOBILE: 2-Column Static Grid with Scroll Reveal (hidden on desktop)
+          ============================================================ */}
+      <section className="py-12 px-4 relative block md:hidden">
+        <style>{`
+          .mobile-reveal-card {
+            opacity: 0;
+            transform: translateY(28px) scale(0.97);
+            transition: opacity 0.6s cubic-bezier(0.22, 1, 0.36, 1),
+                        transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+          }
+          .mobile-reveal-card.revealed {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+          }
+          /* Stagger effect for pairs: second card in each row delays slightly */
+          .mobile-reveal-card:nth-child(even) {
+            transition-delay: 0.1s;
+          }
+        `}</style>
+
+        <div className="mb-6 text-center">
+          <span className="text-xs font-bold text-[#F36C1E] tracking-[0.2em] uppercase">Gallery Collection</span>
+          <p className="text-xs text-[#5e544e] mt-1">Tap any painting to view full details.</p>
+        </div>
+
+        <div ref={mobileGridRef} className="grid grid-cols-2 gap-3">
+          {artworks.map((art) => (
+            <Link
+              key={art.id}
+              href={`/artwork/${categoryKey}/${art.id}`}
+              className="mobile-reveal-card group cursor-pointer relative rounded-[16px] bg-white p-2.5 border border-stone-200/80 shadow-sm active:shadow-md active:scale-[0.98] transition-shadow"
+            >
+              <div className="relative w-full aspect-[3/4] rounded-[12px] overflow-hidden bg-stone-100 mb-3 border border-stone-200/40">
+                <Image
+                  src={art.imageSrc}
+                  alt={art.title}
+                  fill
+                  sizes="(max-width: 768px) 50vw, 360px"
+                  className="object-cover"
+                />
+              </div>
+
+              <div className="flex flex-col px-1">
+                <span className="text-[8px] font-bold text-[#F36C1E] tracking-widest uppercase mb-0.5">
+                  {art.category === "black-and-white" ? "B&W" : "Abstract"}
+                </span>
+                <h3 className="font-serif text-[13px] font-semibold text-[#2e2824] leading-snug line-clamp-1">
+                  {art.title}
+                </h3>
+                <p className="text-[10px] text-[#5e544e] mt-0.5 font-light line-clamp-1">
+                  {art.medium}
+                </p>
+              </div>
+            </Link>
+          ))}
         </div>
       </section>
 
